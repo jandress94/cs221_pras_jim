@@ -1,10 +1,3 @@
-# THIS IS A NOTE OF THINGS THAT I NEED TO FIX:
-# -> moves that cause castling rights to change DONE
-# -> capturing promoted pieces DONE
-# -> check that the game has ended DONE
-# -> can't castle through a check DONE
-# -> better support for illegal moves from human DONE
-
 from Constants import *
 from itertools import product
 from PieceUtils import *
@@ -84,24 +77,6 @@ class Board:
     def pieces(self, player):
         return chess_pieces[player]
 
-    # gets all moves that are legal if we ignore any checks
-    # the exclude_king parameter
-    # def get_legal_moves_help(self):
-    #     position = self.position
-    #     moves = []
-    #     for (row, col) in product(xrange(len(position)), xrange(len(position))):
-    #         if is_mine(self, position[row][col]):
-    #             moves += get_legal_moves_for_piece(self, (row, col))
-    #     return moves
-
-    # def get_king_pos(self, player):
-    #     position = self.position
-    #     king = 'K' if player == 'w' else 'k'
-    #     for (row, col) in product(xrange(len(position)), xrange(len(position))):
-    #         if position[row][col] == king:
-    #             return (row, col)
-    #     return None
-
     # better version of under attack
     # iterates trough some under_attack_by_X()
     def under_attack(self, pos, perspective):
@@ -157,64 +132,6 @@ class Board:
 
 
 
-    # def get_legal_moves(self):
-    #     attack_fns = {
-    #                 'p': under_attack_by_pawn,
-    #                 'k': under_attack_by_king,
-    #                 'n': under_attack_by_knight,
-    #                 'b': under_attack_by_bishop,
-    #                 'r': under_attack_by_rook,
-    #                 'q': under_attack_by_queen
-    #                 }
-    #
-    #     moves = self.get_legal_moves_help()
-    #     moves_to_return = copy(moves)
-    #     # print [move.move_to_str() for move in moves]
-    #     for move in moves:
-    #         # Reasons why a move could result in check:
-    #         #   -> (1) we were already in check, and didn't fix it
-    #         #       "fixing it" constitutes blocking the attack, ,
-    #         #       taking the piece, or moving out of the way
-    #         #   -> (2) moving a pinnned piece
-    #
-    #         # casework for (1)
-    #         # first check: we are in check, and we didn't move the
-    #         # king out of the way, and we didn't capture the checking
-    #         # piece
-    #         if checking_pos != None and \
-    #         not (move.start != None and \
-    #         self.get_piece(move.start[0], move.start[1]) == ('K' if self.turn == 'w' else 'k')) and \
-    #         move.end != checking_pos:
-    #             # check if we blocked, by putting a pawn there and seeing if still under attack
-    #             end_piece = self.get_piece(move.end[0], move.end[1])
-    #             self.set_piece(move.end[0], move.end[1], ('P' if self.turn == 'w' else 'p'))
-    #             checking_piece = self.get_piece(checking_pos[0], checking_pos[1])[0]
-    #             attack_fn = attack_fns[checking_piece.lower()]
-    #             if attack_fn(self, self.get_king_pos(self.turn)) != None:
-    #                 moves_to_return.remove(move)
-    #             # undo changes
-    #             self.set_piece(move.end[0], move.end[1], end_piece)
-    #
-    #         # casework for (2)
-    #         elif checking_pos == None and move.start != None:
-    #             end_piece = self.get_piece(move.end[0], move.end[1])
-    #             moving_piece = self.get_piece(move.start[0], move.start[1])
-    #             self.set_piece(move.end[0], move.end[1], moving_piece)
-    #             self.set_piece(move.start[0], move.start[1], None)
-    #             if self.is_in_check(self.turn) != None:
-    #                 moves_to_return.remove(move)
-    #             # undo changes
-    #             self.set_piece(move.start[0], move.start[1], moving_piece)
-    #             self.set_piece(move.end[0], move.end[1], end_piece)
-    #
-    #         # # simulate a move
-    #         # board = self.make_move_from_move(move, True)
-    #         # # check if that causes the player to be in check
-    #         # if board.is_in_check(self.turn):
-    #         #     moves_to_return.remove(move)
-    #     shuffle(moves_to_return)
-    #     return moves_to_return
-
     def print_legal_moves(self):
         print [move.move_to_str() for move in self.get_legal_moves()]
 
@@ -226,7 +143,6 @@ class Board:
     #       for this sort of encoding, this function figures out which of
     #       the above types is correct
     #   -> promotion: encoded "e7e8, Q" for white, or "e2e1, q" for black
-    #   -> placement encoded "Q@e2" for white, or "q@e2" for black
     # assumes that move strings are correctly formatted
     def get_move(self, move_str):
 
@@ -269,27 +185,6 @@ class Board:
             return 'd'
         return None
 
-    # note: castling rights for these catagories might already be False
-    # this can probably be done with cleaner code (less hardcoding)
-    # def rook_castle_change(self, pos):
-    #     if pos == (0, 0):
-    #         self.castling['w'][0] = False
-    #     elif pos == (0, 7):
-    #         self.castling['w'][1] = False
-    #     elif pos == (7, 0):
-    #         self.castling['b'][0] = False
-    #     elif pos == (7, 7):
-    #         self.castling['b'][1] = False
-    #
-    # def update_in_hand(self, taken_piece):
-    #     if len(taken_piece) == 1:
-    #         board_cpy.in_hand[board_cpy.turn][switch_sides(taken_piece, board_cpy.turn)] += 1
-    #     else: # capturing a piece that was promoted
-    #         board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
-    #     # update castling rights
-    #     if taken_piece.lower() == 'r':
-    #         board_cpy.rook_castle_change(move.end)
-
     # makes move given an instance of Move (rather than a string)
     def make_move_from_move(self, move):
 
@@ -305,7 +200,6 @@ class Board:
         # the possible moves are as follows:
         # 1. moving a piece from one spot to an empty spot that's not the ep target
         #   -> essentially constitutes changing the position of a piece
-        #   -> note: castling rights can change here
         # 2. taking a piece
         #   -> change position of taking piece
         #   -> add taken piece to board.turn's in_hand
