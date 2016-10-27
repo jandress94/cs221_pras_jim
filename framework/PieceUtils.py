@@ -2,6 +2,16 @@ from Move import Move
 from Constants import *
 from itertools import product
 
+
+# attack_fns = {
+#             'p': under_attack_by_pawn,
+#             'k': under_attack_by_king,
+#             'n': under_attack_by_knight,
+#             'b': under_attack_by_bishop,
+#             'r': under_attack_by_rook,
+#             'q': under_attack_by_queen
+# }
+
 def get_legal_moves_for_piece(board, pos):
     piece = board.position[pos[0]][pos[1]]
     turn = board.turn
