@@ -16,4 +16,4 @@ class OracleTest:
             if str(mv) == str(engine_move):
                 print "These moves are the same"
             else:
-                print "THese moves are not the same"
+                print "These moves are not the same"
