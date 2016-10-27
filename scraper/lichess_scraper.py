@@ -3,8 +3,8 @@ import re
 import urllib
 import requests
 
-numPages = 10
-out_file = 'antichess_games.txt'
+numPages = 1
+out_file = 'data/antichess_games.txt'
 
 def main():
     url = 'https://en.lichess.org/games/search'
