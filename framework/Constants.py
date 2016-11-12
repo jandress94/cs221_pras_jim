@@ -6,8 +6,8 @@ chess_pieces = {
 # promoted pieces are marked, because they are converted
 # to pawns when captured
 promotion_pieces = {
-    'w': {'Q*', 'R*', 'B*', 'N*'},
-    'b': {'q*', 'r*', 'b*', 'n*'}
+    'w': {'K*', 'Q*', 'R*', 'B*', 'N*'},
+    'b': {'k*', 'q*', 'r*', 'b*', 'n*'}
 }
 
 opponent = {

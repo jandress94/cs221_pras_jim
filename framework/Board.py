@@ -4,6 +4,7 @@ from PieceUtils import *
 from Move import Move
 from copy import deepcopy, copy
 from random import shuffle
+import sys
 
 class Board:
     def __init__(self, white="White", black="Black", position=None):
@@ -234,17 +235,17 @@ class Board:
             board_cpy.set_piece(move.start[0], move.start[1], None)
             board_cpy.set_piece(move.end[0], move.end[1], moving_piece)
             board_cpy.set_piece(move.end[0] - (1 if board_cpy.turn == 'w' else -1), move.end[1], None)
-            board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
+            # board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
 
         # condition (4): promotion
         elif move.promoting_piece != None:
             board_cpy.set_piece(move.start[0], move.start[1], None)
             board_cpy.set_piece(move.end[0], move.end[1], move.promoting_piece + '*')
-            if taken_piece != None:
-                if len(taken_piece) == 1:
-                    board_cpy.in_hand[board_cpy.turn][switch_sides(taken_piece, board_cpy.turn)] += 1
-                else: # capturing a piece that was promoted
-                    board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
+            # if taken_piece != None:
+            #     if len(taken_piece) == 1:
+            #         board_cpy.in_hand[board_cpy.turn][switch_sides(taken_piece, board_cpy.turn)] += 1
+            #     else: # capturing a piece that was promoted
+            #         board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
 
             board_cpy.halfmove_since_capt_pawn = 0
 
@@ -303,9 +304,10 @@ class Board:
 
         # promotion case (5)
         if '=' in norm_alg:
-            start_str = norm_alg[0] + ('7' if norm_alg[-3] == 'w' else '2')
+            start_str = norm_alg[0] + ('7' if norm_alg[-3] == '8' else '2')
             end_str = norm_alg[-4:-2]
             prom = norm_alg[-1].upper() if '8' == end_str[-1] else norm_alg[-1].lower()
+            return Move(str_to_square(start_str), str_to_square(end_str), prom, capt)
         else:
             end_str = norm_alg[-2:]
             end = str_to_square(end_str)
@@ -314,16 +316,26 @@ class Board:
             # checks are in this order:
             #   1. end point is correct
             poss_moves = [move for move in moves if (move.end == end and \
-            (self.get_piece(move.start[0], move.start[1]).upper() == norm_alg[0] or\
-            (self.get_piece(move.start[0], move.start[1]).upper() ==  'P' and \
-            norm_alg[0].islower())))]
-            if len(poss_moves) == 0: print "MAYDAY MAYDAY ABORT ABORT"
+                (self.get_piece(move.start[0], move.start[1]).upper()[0] == norm_alg[0] or \
+                (self.get_piece(move.start[0], move.start[1]).upper()[0] ==  'P' and \
+                norm_alg[0].islower())))]
+            if len(poss_moves) == 0: 
+            	print 'DANGER DANGER ABORT ABORT'
+            	sys.exit(1)
             if len(poss_moves) == 1: return poss_moves[0]
-            for move in moves:
+            for move in poss_moves:
                 start_str = pos_to_str(move.start)
                 # check if column matches or row matches
-                if start_str[0] == norm_move[1] or start_str[1] == norm_move[1]:
-                    return move
+                # if pawn will be something like fxe3
+                # otherwise will be something like Nce7
+
+                # if start_str[0] == norm_move[1] or start_str[1] == norm_move[1]:
+                if norm_alg[0].islower():
+                    if start_str[0] == norm_alg[0] or start_str[1] == norm_alg[0]:
+                        return move
+                else:
+                    if start_str[0] == norm_alg[1] or start_str[1] == norm_alg[1]:
+                        return move
             start, end = str_to_square(start_str), str_to_square(end_str)
             return Move(start, end, prom, capt)
 
