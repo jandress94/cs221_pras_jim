@@ -1,14 +1,21 @@
 from random import choice
+from Engine import Engine
 
-class Human:
+class Human(Engine):
     def __init__(self):
         pass
 
-    def get_best_move(self, board):
+    def get_next_move(self, board):
         move = "ILLEGAL_MOVE"
         while move == "ILLEGAL_MOVE":
             move_str = raw_input("Play a move: ")
-            move = board.get_move(move_str)
+            try:
+                move = board.get_move(move_str)
+            except IndexError:
+                print "Invalid input"
+                board.print_legal_moves()
+                continue
+                
             board.print_legal_moves()
             if move.params not in [poss.params for poss in board.get_legal_moves()]:
                 move = "ILLEGAL_MOVE"

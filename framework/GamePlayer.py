@@ -37,9 +37,9 @@ class GamePlayer:
         self.print_log(self.board)
         while self.board.result == None:
             if self.board.turn == 'w':
-                move, ev = self.white_engine.get_best_move(self.board)
+                move, ev = self.white_engine.get_next_move(self.board)
             else:
-                move, ev = self.black_engine.get_best_move(self.board)
+                move, ev = self.black_engine.get_next_move(self.board)
             self.print_move_information(move)
             self.board = self.board.make_move_from_move(move)
             self.print_log(self.board)

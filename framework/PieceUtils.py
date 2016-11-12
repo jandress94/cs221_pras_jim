@@ -249,8 +249,7 @@ def get_legal_moves_for_king(board, pos):
         (-1, 1), (1, -1)
         ]
     for delta in pos_deltas:
-        if valid_br(board, (delta[0] + pos[0], delta[1] + pos[1])) and \
-        (board.under_attack((delta[0] + pos[0], delta[1] + pos[1]), board.turn) == None):
+        if valid_br(board, (delta[0] + pos[0], delta[1] + pos[1])):
             if board.get_piece(delta[0] + pos[0], delta[1] + pos[1]) != None:
                 # capture case
                 legal_moves.append(Move(pos, (delta[0] + pos[0], delta[1] + pos[1]), capture=True))

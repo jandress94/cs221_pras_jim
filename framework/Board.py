@@ -179,9 +179,9 @@ class Board:
     def result_checks(self):
         if len(self.get_legal_moves()) == 0:
             if not self.has_pieces(self.turn): # out of pieces!!
-                return opponent[self.turn]
+                return self.turn
             else: # Stalemate!!
-                return 'd'
+                return self.turn
         if self.halfmove_since_capt_pawn >= 50:
             return 'd'
         return None
