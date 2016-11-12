@@ -216,9 +216,10 @@ class Board:
 
         if move.start != None: moving_piece = board_cpy.get_piece(move.start[0], move.start[1])
         taken_piece = board_cpy.get_piece(move.end[0], move.end[1])
+        epSet = False
 
         # conditions for (1) or (2): move or take
-        if (move.end != board_cpy.ep) and move.promoting_piece == None:
+        if (move.end != board_cpy.ep or (moving_piece != 'p' and moving_piece != 'P')) and move.promoting_piece == None:
             # change board
             # TODO update piece locations
             board_cpy.set_piece(move.start[0], move.start[1], None)
@@ -228,6 +229,9 @@ class Board:
             if taken_piece != None or moving_piece == 'p' or moving_piece == 'P':
                 board_cpy.halfmove_since_capt_pawn = 0
 
+            if (moving_piece == 'p' or moving_piece == 'P') and abs(move.start[0] - move.end[0]) == 2:
+                board_cpy.ep = (move.end[0] - (1 if board_cpy.turn == 'w' else -1), move.end[1])
+                epSet = True
 
         #  condition (3): ep
         elif (move.end == board_cpy.ep) and (moving_piece == 'p' or moving_piece == 'P'):
@@ -256,6 +260,9 @@ class Board:
 
         if board_cpy.halfmove_since_capt_pawn !=  0: # means no capture or pawn advance
             board_cpy.halfmove_since_capt_pawn += 1
+
+        if not epSet:
+            board_cpy.ep = None
 
         board_cpy.result = board_cpy.result_checks()
 
@@ -319,7 +326,10 @@ class Board:
                 (self.get_piece(move.start[0], move.start[1]).upper()[0] == norm_alg[0] or \
                 (self.get_piece(move.start[0], move.start[1]).upper()[0] ==  'P' and \
                 norm_alg[0].islower())))]
-            if len(poss_moves) == 0: 
+            if len(poss_moves) == 0:
+                # check for en passant
+                for move in moves:
+                    print str(move)
             	print 'DANGER DANGER ABORT ABORT'
             	sys.exit(1)
             if len(poss_moves) == 1: return poss_moves[0]
