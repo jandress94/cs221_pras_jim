@@ -172,7 +172,7 @@ class Board:
         for (row, col) in product(xrange(len(self.position)), xrange(len(self.position))):
             piece = self.get_piece(row, col)
             if piece != None and ((player == 'w') == (piece[0]).isupper()):
-                print piece
+                # print piece
                 return True
         return False
 
@@ -328,8 +328,6 @@ class Board:
                 norm_alg[0].islower())))]
             if len(poss_moves) == 0:
                 # check for en passant
-                for move in moves:
-                    print str(move)
             	print 'DANGER DANGER ABORT ABORT'
             	sys.exit(1)
             if len(poss_moves) == 1: return poss_moves[0]
