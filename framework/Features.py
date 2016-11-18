@@ -2,8 +2,16 @@ from Board import *
 from collections import defaultdict
 
 
-# helpers for the evaluaton function
+def dotProduct(d1, d2):
+    if len(d1) < len(d2):
+        return dotProduct(d2, d1)
+    else:
+        return sum(d1.get(f, 0) * v for f, v in d2.items())
 
+def eval(board, weights):
+    return dotProduct(weights, feature_extractor(weights))
+
+# helpers for the evaluaton function
 
 def feature_extractor(board):
     # TODO add more features

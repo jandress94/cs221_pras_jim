@@ -29,9 +29,10 @@ class GamePlayer:
 
 
     def print_move_information(self, move):
-        player = "White" if self.board.turn == 'w' else "Black"
-        print "Move: ", self.board.moves
-        print player, "played the move ", str(move)
+        if self.log:
+            player = "White" if self.board.turn == 'w' else "Black"
+            print "Move: ", self.board.moves
+            print player, "played the move ", str(move)
 
     def play_game(self):
         self.print_log(self.board)
