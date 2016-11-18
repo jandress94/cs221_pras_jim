@@ -1,5 +1,6 @@
 from Board import Board
 from HumanEngine import Human
+from Features import feature_extractor
 
 class GamePlayer:
     def __init__(self, white_engine=Human(), black_engine=Human(), log=True):

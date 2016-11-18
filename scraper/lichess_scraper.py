@@ -3,8 +3,8 @@ import re
 import urllib
 import requests
 
-numPages = 1
-out_file = 'data/antichess_games.txt'
+numPages = 1000
+out_file = 'data/antichess_games_3.txt'
 
 def main():
     url = 'https://en.lichess.org/games/search'
@@ -13,14 +13,15 @@ def main():
     
     f=open(out_file, 'a')
 
-    for pageNum in xrange(1, 1+numPages):
+    for pageNum in xrange(120, 1+numPages):
     	params['page'] = str(pageNum)
     	print 'Downloading Page', pageNum, 'out of', numPages
-    	response = requests.get(url, params=params, headers=headers)
-    	html = response.text
+        response = requests.get(url, params=params, headers=headers)
+        html = response.text
         soup = BeautifulSoup(html, "html5lib")
 
         games = soup.find_all('div', 'game_row paginated_element')
+
         for game in games:
             game_url = 'https://en.lichess.org' + game.a.get('href')
             print "    Downloading game from", game_url

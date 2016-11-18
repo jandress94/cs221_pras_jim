@@ -21,14 +21,27 @@ class Board:
     def __str__(self):
         s = "\n"
         board = self.position
-        for row in board:
-            for piece in row:
-                if piece == None:
-                    s +=  " .  "
+        for row in range(7, -1, -1):
+            s += str(row+1) + ' | '
+            for col in range(7, -1, -1):
+                if board[row][col] == None:
+                    s += ' .  '
                 else:
-                    s +=  " " + piece + "  "
-            s +=  '\n\n'
+                    s += ' ' + board[row][col] + '  '
+            s += '\n  |\n'
+        s += '  +---------------------------------\n'
+        s += '     A   B   C   D   E   F   G   H\n'
         return s
+        # s = "\n"
+        # board = self.position
+        # for row in board:
+        #     for piece in row:
+        #         if piece == None:
+        #             s +=  " .  "
+        #         else:
+        #             s +=  " " + piece + "  "
+        #     s +=  '\n\n'
+        # return s
 
     def print_board(self):
         print self

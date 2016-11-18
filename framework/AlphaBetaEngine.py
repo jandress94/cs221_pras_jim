@@ -11,10 +11,11 @@ from Board import *
 #   and playing one of those at random.
 
 class AlphaBeta(Engine):
-    def __init__(self):
+    def __init__(self, eval_function = None):
         self.depth = 3
+        self.evaluation_function = eval_function if eval_function is not None else self.default_eval_function
 
-    def evaluationFunction(self, board):
+    def default_eval_function(self, board):
         return len(board.get_legal_moves())
 
     def get_next_move(self, board):
@@ -23,7 +24,7 @@ class AlphaBeta(Engine):
             legal_moves = board.get_legal_moves()
 
             if board.get_result() != None or len(legal_moves) == 0 or depth == 0:
-                return (None, self.evaluationFunction(board))
+                return (None, self.evaluation_function(board))
 
             if maximizing:
                 highest_eval = float("-inf")

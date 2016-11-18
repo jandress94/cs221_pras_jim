@@ -15,17 +15,13 @@ def parseGame(gameLine):
 
 	# make sure the game ends by listing the winner, and remove that
 	if re.match('\A\d+-\d+\Z', gameData[len(gameData) - 1]) == None:
-		print 'trouble parsing: last element was not the game score.'
-		print 'last element:', gameData[len(gameData) - 1]
-		return []
+		return None
 	winner = gameData.pop()
 
 	# remove the '#' indicating the game ended
 	lastMove = gameData[len(gameData) - 1]
 	if not lastMove.endswith('#'):
-		print 'trouble parsing: last move should end with #'
-		print 'last move:', gameData[len(gameData) - 1]
-		return []
+		return None
 	gameData[len(gameData) - 1] = lastMove[:len(lastMove) - 1]
 
 	moveList = []
@@ -33,9 +29,7 @@ def parseGame(gameLine):
 	for i in xrange(len(gameData)):
 		if i % 3 == 0:
 			if re.match('\A\d+\.\Z', gameData[i]) == None:
-				print 'trouble parsing: was expecting a move number'
-				print 'got:', gameData[i]
-				return []
+				return None
 		elif i % 3 == 1:
 			firstPlayerMove = gameData[i]
 		else:
