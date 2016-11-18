@@ -172,7 +172,6 @@ class Board:
         for (row, col) in product(xrange(len(self.position)), xrange(len(self.position))):
             piece = self.get_piece(row, col)
             if piece != None and ((player == 'w') == (piece[0]).isupper()):
-                # print piece
                 return True
         return False
 
@@ -198,7 +197,6 @@ class Board:
         board_cpy = deepcopy(self)
 
         # list of possible moves and what parameters need to be changed for each
-        # ***** REMEMBER: we need to see if any given move results in a check ******
         # the possible moves are as follows:
         # 1. moving a piece from one spot to an empty spot that's not the ep target
         #   -> essentially constitutes changing the position of a piece
