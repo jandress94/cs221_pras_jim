@@ -3,6 +3,7 @@ from itertools import product
 from PieceUtils import *
 from Move import Move
 from copy import deepcopy, copy
+from collections import defaultdict
 from random import shuffle
 import sys
 
@@ -11,6 +12,7 @@ class Board:
         self.white = white
         self.black = black
         self.position = self.get_starting_position()
+        self.position_count = self.get_pos_counter()
         self.turn = 'w'
         self.pieces = self.find_pieces()
         self.ep = None
@@ -55,6 +57,11 @@ class Board:
         #             print unicode_pieces[piece] + " ",
         #     print '\n'
 
+
+    def get_pos_counter(self):
+        counter = defaultdict(float)
+        counter[str(self)] += 1
+        return counter
 
 
     def get_piece(self, row, col):
@@ -170,7 +177,7 @@ class Board:
             start = str_to_square(start_str)
             end = str_to_square(end_str)
 
-            return Move(start, end, move_str[len(move_str) - 1])
+            return Move(start, end, promoting_piece=move_str[len(move_str) - 1])
 
         else:
             start_str = move_str[:2]
@@ -208,6 +215,7 @@ class Board:
 
         # need to adjust the parameters of the board
         board_cpy = deepcopy(self)
+        halfmove_set_to_zero = False
 
         # list of possible moves and what parameters need to be changed for each
         # the possible moves are as follows:
@@ -238,6 +246,7 @@ class Board:
 
             # if a piece is taken or pawn is advanced, we need to restart halfmove count
             if taken_piece != None or moving_piece == 'p' or moving_piece == 'P':
+                halfmove_set_to_zero = True
                 board_cpy.halfmove_since_capt_pawn = 0
 
             if (moving_piece == 'p' or moving_piece == 'P') and abs(move.start[0] - move.end[0]) == 2:
@@ -263,19 +272,24 @@ class Board:
             #         board_cpy.in_hand[board_cpy.turn]['P' if board_cpy.turn == 'w' else 'p'] += 1
 
             board_cpy.halfmove_since_capt_pawn = 0
+            halfmove_set_to_zero = True
 
 
         # final adjustments
         board_cpy.turn = opponent[board_cpy.turn]
         if board_cpy.turn == 'w': board_cpy.moves += 1
 
-        if board_cpy.halfmove_since_capt_pawn !=  0: # means no capture or pawn advance
+        if not halfmove_set_to_zero: # means no capture or pawn advance
             board_cpy.halfmove_since_capt_pawn += 1
 
         if not epSet:
             board_cpy.ep = None
 
-        board_cpy.result = board_cpy.result_checks()
+        if board_cpy.position_count[str(self)] == 2:
+            board_cpy.result = 'd'
+        else:
+            board_cpy.position_count[str(self)] += 1
+            board_cpy.result = board_cpy.result_checks()
 
 
         return board_cpy
@@ -284,10 +298,11 @@ class Board:
     # moves are made like: e2e4, e2e3
     # returns "ILLEGAL_MOVE" if illegal
     def make_move(self, move_str):
-        move = self.get_move(move_str)
-        if not (move.params in [poss.params for poss in self.get_legal_moves()]):
+        poss_moves = [poss for poss in self.get_legal_moves() if str(poss) == str(move)]
+        # move = self.get_move(move_str)
+        if len(poss_moves) == 0:
             return "ILLEGAL_MOVE"
-        return self.make_move_from_move(move)
+        return self.make_move_from_move(moves[0])
 
     # conversion from algebraic notation to start-end notation
     # takes in string

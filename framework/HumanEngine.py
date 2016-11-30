@@ -12,11 +12,11 @@ class Human(Engine):
             try:
                 move = board.get_move(move_str)
             except IndexError:
-                print "Invalid input"
+                print "Invalid input, here are your choices: "
                 board.print_legal_moves()
                 continue
-                
-            board.print_legal_moves()
+
+            # board.print_legal_moves()
             if move.params not in [poss.params for poss in board.get_legal_moves()]:
                 move = "ILLEGAL_MOVE"
         return move, 0
