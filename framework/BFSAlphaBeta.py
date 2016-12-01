@@ -2,15 +2,11 @@ from Engine import Engine
 from Board import *
 
 # Notes and optimizations:
-# -> currently creates every board from scratch, which is expensive.
-#   would be better to keep track of some sort of game tree, and expand when needed
-# -> uses simple eval function, should eventually use Features.py for eval function
-# -> simple eval function beats Random() every time, perhaps can serve as an improved baseline.
-# -> AlphaBeta has a hard time moving first because of all the possibilities. It might be useful
-#   to keep a small opening book (like a few moves which are known not to be totally losing)
-#   and playing one of those at random.
+# CURRENTLY JUST ALPHABETA; HAVEN'T ACTUALLY BUILT THIS YET
+# DON'T BOTHER READING THIS FILE
+# SERIOUSLY STOP
 
-class AlphaBeta(Engine):
+class BFSAlphaBeta(Engine):
     def __init__(self, eval_function = None):
         self.depth = 3
         self.evaluation_function = eval_function if eval_function is not None else self.default_eval_function
@@ -24,15 +20,7 @@ class AlphaBeta(Engine):
             legal_moves = board.get_legal_moves()
 
             if board.get_result() != None or len(legal_moves) == 0 or depth == 0:
-                evaluation = self.evaluation_function(board)
-                if board.get_result() != None:
-                    if board.get_result() == board.turn:
-                        evaluation = float('inf')
-                    elif board.get_result() == 'd':
-                        evaluation = 0
-                    elif board.get_result() != board.turn:
-                        evaluation = float('-inf')
-                return (None, evaluation)
+                return (None, self.evaluation_function(board))
 
             if maximizing:
                 highest_eval = float("-inf")

@@ -8,7 +8,9 @@ from os import listdir
 from os.path import isfile, join
 from GamePlayer import GamePlayer
 from AlphaBetaEngine import AlphaBeta
+from DynamicDepthAlphaBetaEngine import DynamicDepthAlphaBeta
 from EpsGreedyAlphaBetaEngine import EpsGreedyAlphaBeta
+from ForcedLineAlphaBetaEngine import ForcedLineAlphaBeta
 from HumanEngine import Human
 import random
 
@@ -128,11 +130,25 @@ class TDLearnerData:
     def get_engine(self):
         return AlphaBeta(self.get_board_evaluator())
 
+
+def get_eval(weights):
+    return lambda board : self.eval_fn(board, weights, self.turn)
+
 # TESTING STUFF
-for _ in range(1):
-    data_folder = '../scraper/data/'
-    white_learner = TDLearnerData('w', feature_extractor, eval, data_folder, 0.001, False)
-    black_learner = TDLearnerData('b', feature_extractor, eval, data_folder, 0.001, False)
-    game = GamePlayer(Human(), black_learner.get_engine())
+data_folder = '../scraper/data/'
+white_learner = TDLearnerData('w', feature_extractor, learning_eval, data_folder, 0.001, False)
+black_learner = TDLearnerData('b', feature_extractor, learning_eval, data_folder, 0.001, False)
+# weights = white_learner.get_weights()
+w_eval = white_learner.get_board_evaluator()
+b_eval = black_learner.get_board_evaluator()
+
+# for _ in range(10):
+game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.5), ForcedLineAlphaBeta(w_eval), log=False)
+# game = GamePlayer(ForcedLineAlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
+
+# game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.1), DynamicDepthAlphaBeta(w_eval), log=False)
+# game = GamePlayer(AlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
+# game = GamePlayer(DepthlessAlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
+# game = GamePlayer(DepthlessAlphaBeta(lambda board : eval(board, weights, 'w')), EpsGreedyAlphaBeta(lambda board : eval(board, weights, 'b')), log=True)
     # game = GamePlayer(white_engine=get_engine(eval, 'w', feature_extractor), black_engine=get_engine(eval, 'b', feature_extractor))
-    game.play_game()
+game.play_n_games(10)

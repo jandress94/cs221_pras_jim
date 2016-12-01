@@ -1,16 +1,33 @@
 from Engine import Engine
 from Board import *
 
-# Notes and optimizations:
-# -> currently creates every board from scratch, which is expensive.
-#   would be better to keep track of some sort of game tree, and expand when needed
-# -> uses simple eval function, should eventually use Features.py for eval function
-# -> simple eval function beats Random() every time, perhaps can serve as an improved baseline.
-# -> AlphaBeta has a hard time moving first because of all the possibilities. It might be useful
-#   to keep a small opening book (like a few moves which are known not to be totally losing)
-#   and playing one of those at random.
+# IDEA: A version of alpha-beta that goes as far as possible into forced lines
+# This is the most successful engine we have so far. After playing against a normal
+# AlphaBeta with 10% randomization, we get the following stats dumps:
+# As WHITE:
+# In 10 games there were 8 wins for white, 2 wins for black, and 0 draws
+# On average, the winner was certain of a win 6 moves before the win
+# **************** TOTALS FOR WHITE ****************
+# On average,  white  made  25.3  moves
+# On average,  white  had  12.6628378863  legal moves
+# **************** TOTALS FOR BLACK ****************
+# On average,  black  made  25.1  moves
+# On average,  black  had  7.6592784744  legal moves
+#
+# As BLACK:
+# In 10 games there were 0 wins for white, 10 wins for black, and 0 draws
+# On average, the winner was certain of a win 13 moves before the win
+# **************** TOTALS FOR WHITE ****************
+# On average,  white  made  20.7  moves
+# On average,  white  had  5.81346473562  legal moves
+# **************** TOTALS FOR BLACK ****************
+# On average,  black  made  19.7  moves
+# On average,  black  had  10.6810538155  legal moves
+#
+# NOTE: there may be bug in "certain of win before..." code, I think i fixed it; will check in morning
 
-class AlphaBeta(Engine):
+
+class ForcedLineAlphaBeta(Engine):
     def __init__(self, eval_function = None):
         self.depth = 3
         self.evaluation_function = eval_function if eval_function is not None else self.default_eval_function
@@ -51,10 +68,11 @@ class AlphaBeta(Engine):
             else:
                 lowest_eval  = float("inf")
                 opt_move = None
+                next_depth = depth + 1 if len(legal_moves) <= 1 else depth - 1
                 for move in legal_moves:
                     succ = board.make_move_from_move(move)
                     lowest_eval = min(lowest_eval, \
-                    recurse(succ, not maximizing, depth - 1, alpha, beta)[1])
+                    recurse(succ, not maximizing, next_depth, alpha, beta)[1])
                     if lowest_eval < beta:
                         beta = lowest_eval
                         opt_move = move
