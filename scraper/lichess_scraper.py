@@ -8,12 +8,13 @@ out_file = 'data/antichess_games_3.txt'
 
 def main():
     url = 'https://en.lichess.org/games/search'
-    params = { 'page': '1', 'perf': '13', 'status': '60', 'sort.field': 'd', 'sort.order': 'desc', '_': '1477283238146' }
+    params = { 'page': '1', 'perf': '13', 'status': '60', 'sort.field': 'd', 'sort.order': 'desc' }
+    # params = { 'page': '1', 'perf': '13', 'status': '60', 'sort.field': 'd', 'sort.order': 'desc', '_': '1477283238146' }
     headers = { 'Connection': 'keep-alive', 'Accept': 'text/html, */*; q=0.01', 'X-Requested-With': 'XMLHttpRequest', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36', 'Referer': 'https://en.lichess.org/games/search?page=1&perf=13&status=60&sort.field=d&sort.order=desc&_=1477270963263', 'Accept-Encoding': 'gzip, deflate, sdch, br', 'Accept-Language': 'en-US,en;q=0.8' }
     
     f=open(out_file, 'a')
 
-    for pageNum in xrange(120, 1+numPages):
+    for pageNum in xrange(1+numPages):
     	params['page'] = str(pageNum)
     	print 'Downloading Page', pageNum, 'out of', numPages
         response = requests.get(url, params=params, headers=headers)

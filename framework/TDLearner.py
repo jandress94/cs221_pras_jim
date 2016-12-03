@@ -20,6 +20,7 @@ class TDLearner:
         self.eta = 0.001
         self.grad_sum = defaultdict(float)
         self.winner = win
+        self.lambd = 0.25
 
     def set_engine(self, color, engine):
         if color == 'w':
@@ -28,16 +29,25 @@ class TDLearner:
             self.black_engine = engine
 
     def update_weights(self, start_board, end_board, weights):
-        if end_board.result is None: reward = 0
+        if end_board.result is None: reward = eval(end_board, weights, 'w')
         elif end_board.result == 'w': reward = 1
         else: reward = -1
+        # if reward != 0:
+        #     print reward
 
-        update_weight = self.eta * (eval(start_board, weights, 'w') - (reward + eval(end_board, weights, 'w')))
+        update_weight = self.eta * (reward - eval(start_board, weights, 'w'))
+
         grad_value = feature_extractor(start_board)
-        for key in grad_value:
-            # self.grad_sum[key] += grad_value[key]
-            # weights[key] -= update_weight * self.grad_sum[key]
-            weights[key] -= update_weight * grad_value[key]
+        addScaled(grad_value, self.grad_sum, self.lambd)
+        self.grad_sum = grad_value
+        addScaled(weights, self.grad_sum, update_weight)
+
+        # grad_value = feature_extractor(start_board)
+        # for key in grad_value:
+
+        #     # self.grad_sum[key] += grad_value[key]
+        #     # weights[key] -= update_weight * self.grad_sum[key]
+        #     weights[key] += update_weight * grad_value[key]
         return weights
 
     def learn_from_game(self, weights):
@@ -55,11 +65,13 @@ class TDLearner:
                 weights = self.update_weights(self.board, next_board, weights)
 
             self.board = next_board
+        weights = self.update_weights(self.board, next_board, weights)
         print weights
         return weights
 
 
 weights = defaultdict(float)
+weights['w mobility'] = 0.1
 
 data_folder = '../scraper/data/'
 f = listdir(data_folder)[1]
@@ -72,8 +84,12 @@ for line in file_reader:
     else:
         game_data = parseGame(line)
         if game_data is not None:
-            winner = 'w' if game_data[len(game_data) - 1][1] == None else 'b'
-            tdLearner = TDLearner(white_engine=Lichess(game_data, 'w'), black_engine=Lichess(game_data, 'b'), win = winner)
+
+            game = GamePlayer(white_engine=Lichess(game_data, 'w'), black_engine=Lichess(game_data, 'b'), log = False)
+            game.play_game()
+
+            # winner = 'b' if game_data[len(game_data) - 1][1] == None else 'w'
+            tdLearner = TDLearner(white_engine=Lichess(game_data, 'w'), black_engine=Lichess(game_data, 'b'), win = game.board.result)
             weights = tdLearner.learn_from_game(weights)
             print
     lineNum += 1

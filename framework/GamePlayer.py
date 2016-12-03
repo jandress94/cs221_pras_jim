@@ -20,6 +20,8 @@ class GamePlayer:
             print s
 
     def print_result(self):
+        if not self.log: return
+        
         board = self.board
         # winner
         if board.result == 'd':

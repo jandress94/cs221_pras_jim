@@ -170,7 +170,7 @@ class Board:
             start = str_to_square(start_str)
             end = str_to_square(end_str)
 
-            return Move(start, end, move_str[len(move_str) - 1])
+            return Move(start, end, move_str[len(move_str) - 1], self.get_piece(end[0], end[1]) is not None)
 
         else:
             start_str = move_str[:2]
