@@ -90,8 +90,16 @@ class TDLearnerData:
         #     total = sum([abs(x) for x in dict(d).values()])
         #     for key in d:
         #         d[key] /= total
-
-        weights = defaultdict(float)
+        weights = {'w mobility': 0.00794453399588799, 'w pieces n': -0.37770634987581486, \
+        'b pieces n': 0.3259256111814666, 'w pieces k': -0.217740060989421, \
+        'b pieces k': 0.1975389514945781, 'w pieces r': -0.43857848646965436, \
+        'w pieces q': -0.1965540356358875, 'w pieces b': -0.32153572268987485, \
+        'b pieces b': 0.25215039828608354, 'b pieces r': 0.30588559507108515, \
+        'b pieces q': 0.106430088995805,'b pieces p': 0.5986063533783763, \
+        'w pieces p': -0.9282910790839152, 'b mobility': -0.006369695141804626}
+        return weights
+        # weights = defaultdict(float)
+        # return weights
 
         # data_folder = '../scraper/data/'
         f = listdir(self.data_folder)[1]
@@ -120,6 +128,7 @@ class TDLearnerData:
         for feature, weight in sorted(dict(weights).items()):
             print feature, ": ", weight
         file_reader.close()
+        print weights
         return weights
         # return AlphaBeta(eval_function = lambda board : eval_fn(board, weights, turn))
 
@@ -143,12 +152,15 @@ w_eval = white_learner.get_board_evaluator()
 b_eval = black_learner.get_board_evaluator()
 
 # for _ in range(10):
-game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.5), ForcedLineAlphaBeta(w_eval), log=False)
-# game = GamePlayer(ForcedLineAlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
+# game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 5), log=True)
+game1 = GamePlayer(EpsGreedyAlphaBeta(w_eval, 0.2), ForcedLineAlphaBeta(b_eval, 1), log=True)
+game2 = GamePlayer(ForcedLineAlphaBeta(w_eval, 1), EpsGreedyAlphaBeta(b_eval, 0.2), log=False)
 
 # game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.1), DynamicDepthAlphaBeta(w_eval), log=False)
 # game = GamePlayer(AlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
 # game = GamePlayer(DepthlessAlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
 # game = GamePlayer(DepthlessAlphaBeta(lambda board : eval(board, weights, 'w')), EpsGreedyAlphaBeta(lambda board : eval(board, weights, 'b')), log=True)
-    # game = GamePlayer(white_engine=get_engine(eval, 'w', feature_extractor), black_engine=get_engine(eval, 'b', feature_extractor))
-game.play_n_games(10)
+# game = GamePlayer(white_engine=get_engine(eval, 'w', feature_extractor), black_engine=get_engine(eval, 'b', feature_extractor))
+# game.play_n_games(1)
+game1.play_n_games(5)
+game2.play_n_games(5)

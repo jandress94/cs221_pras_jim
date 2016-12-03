@@ -19,7 +19,8 @@ class GamePlayer:
         if self.log:
             print s
 
-    def print_result(self):
+    def print_result(self, i):
+        print "**************** RESULTS FOR GAME %d ****************" % i 
         board = self.board
         # winner
         if board.result == 'd':
@@ -60,8 +61,10 @@ class GamePlayer:
         w_averages = {"num moves":0, "avg legal moves":0, "game won at":0}
         b_averages = {"num moves":0, "avg legal moves":0, "game won at":0}
         predict_avg = 0
-        for _ in range(n):
+        for i in range(n):
             w_stats, b_stats, result = self.play_game()
+            self.print_result(i)
+
             counter[result] += 1
             w_averages = add(w_stats, w_averages)
             b_averages = add(b_stats, b_averages)
@@ -87,24 +90,23 @@ class GamePlayer:
         while self.board.result == None:
             if self.board.turn == 'w':
                 w_stats["num moves"] += 1
-                w_stats["avg legal moves"] += len(self.board.get_legal_moves())
+                w_stats["avg legal moves"] += len(self.board.legal_moves)
                 move, ev = self.white_engine.get_next_move(self.board)
                 if self.log: print "white evaluated ", move, " to ", ev
                 if ev > 1000 and w_stats["game won at"] == 0:
                     w_stats["game won at"] = self.board.moves
             else:
                 b_stats["num moves"] += 1
-                b_stats["avg legal moves"] += len(self.board.get_legal_moves())
+                b_stats["avg legal moves"] += len(self.board.legal_moves)
                 move, ev = self.black_engine.get_next_move(self.board)
                 if self.log: print "black evaluated ", move, " to ", ev
-                if ev < -1000 and b_stats["game won at"] == 0:
+                if ev > 1000 and b_stats["game won at"] == 0:
                     b_stats["game won at"] = self.board.moves
             self.print_move_information(move)
             self.board = self.board.make_move_from_move(move)
             self.print_log(self.board)
-        self.print_result()
         # in case we didn't figure out that we were winning until the end
-        if w_stats["game won at"] = 0 and b_stats["game won at"] = 0:
+        if w_stats["game won at"] == 0 and b_stats["game won at"] == 0:
             if self.board.result == 'w':
                 w_stats["game won at"] = self.board.moves
             elif self.board.result == 'b':

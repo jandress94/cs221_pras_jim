@@ -15,9 +15,11 @@ class DynamicDepthAlphaBeta(Engine):
         self.evaluation_function = eval_function if eval_function is not None else self.default_eval_function
 
     def default_eval_function(self, board):
-        return len(board.get_legal_moves())
+        return len(board.legal_moves)
 
     def get_next_move(self, board):
+        if len(board.legal_moves) == 1: return (board.legal_moves[0], 0)
+
         calculated_best_moves = []
         eval_counts = []
         max_evals = self.max_evals
@@ -47,7 +49,7 @@ class DynamicDepthAlphaBeta(Engine):
         # returns (move, eval) pair
         def recurse(board, maximizing, depth, alpha=float("-inf"), beta=float("inf")):
             num_evals[0] += 1
-            legal_moves = board.get_legal_moves()
+            legal_moves = board.legal_moves
 
             if board.get_result() != None or len(legal_moves) == 0 or (depth <= 0 or num_evals[0] >= self.max_evals):
                 evaluation = self.evaluation_function(board)

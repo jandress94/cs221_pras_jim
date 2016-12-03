@@ -19,6 +19,7 @@ class Board:
         self.halfmove_since_capt_pawn = 0
         self.moves = 1
         self.result = None # possible values: 'w', 'b', 'd'
+        self.legal_moves = self.get_legal_moves()
 
     def __str__(self):
         s = "\n"
@@ -291,6 +292,7 @@ class Board:
             board_cpy.position_count[str(self)] += 1
             board_cpy.result = board_cpy.result_checks()
 
+        board_cpy.legal_moves = board_cpy.get_legal_moves()
 
         return board_cpy
 
