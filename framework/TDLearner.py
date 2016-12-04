@@ -25,11 +25,11 @@ class TDLearnerGame:
         self.board = Board()
         self.eta = eta
         self.grad_sum = defaultdict(float)
+        self.lambd = 0.7
         self.winner = win
         self.extractor = feature_extractor
         self.eval_fn = eval_fn
         self.log = log
-        # self.turn = turn
 
     def set_engine(self, color, engine):
         if color == 'w':
@@ -38,13 +38,18 @@ class TDLearnerGame:
             self.black_engine = engine
 
     def update_weights(self, start_board, end_board, weights, turn):
-        if end_board.result is None: reward = 0
+        if end_board.result is None: 
+            reward = self.eval_fn(end_board, weights, turn)
         elif end_board.result == turn: reward = 1
         else: reward = -1
 
-        update_weight = self.eta * (self.eval_fn(start_board, weights, turn) - (reward + self.eval_fn(end_board, weights, turn)))
+        update_weight = self.eta * (reward - self.eval_fn(start_board, weights, turn))
         grad_value = self.extractor(start_board, turn)
-        addScaled(weights, grad_value, -update_weight)
+
+        addScaled(grad_value, self.grad_sum, self.lambd)
+        self.grad_sum = grad_value
+
+        addScaled(weights, self.grad_sum, update_weight)
 
         return weights
 
@@ -97,13 +102,13 @@ class TDLearnerData:
         #     total = sum([abs(x) for x in dict(d).values()])
         #     for key in d:
         #         d[key] /= total
-        weights = {'my pieces b': -0.2893630954069259, 'opponent mobility': -0.009047193001818138, \
-            'opponent pieces q': 0.022491678652511306, 'opponent pieces p': 0.5016118232502623, \
-            'opponent pieces r': 0.2862796002329135, 'my pieces k': -0.1121762494805236, \
-            'my pieces r': -0.2220589904426514, 'my pieces n': -0.2602621308703907, \
-            'my pieces p': -0.4967786641973036, 'my pieces q': -0.2318797920150573, \
-            'my mobility': 0.032986011312793606, 'opponent pieces b': 0.11468715464276205, \
-            'opponent pieces n': 0.2593102126638174, 'opponent pieces k': 0.22001222207990012}
+        weights = {'my pieces b': -0.020805240865742317, 'opponent mobility': 0.006038924232797547, \
+            'opponent pieces q': 0.0031809482535582563, 'opponent pieces p': 0.08542855701037787, \
+            'opponent pieces r': 0.03130194131137462, 'my pieces k': -0.004348334410101487, \
+            'my pieces r': -0.012264248129115054, 'my pieces n': -0.021129062238778695, \
+            'my pieces p': -0.04592605265576196, 'my pieces q': -0.016223203304076266, \
+            'my mobility': 0.005539364980023288, 'opponent pieces b': 0.014757655681540789, \
+            'opponent pieces n': 0.030392414884365324, 'opponent pieces k': 0.026302758142338463}
         return weights
         weights = defaultdict(float)
         # return weights
@@ -155,8 +160,8 @@ def get_eval(weights):
 
 # TESTING STUFF
 data_folder = '../scraper/data/'
-white_learner = TDLearnerData('w', feature_extractor, learning_eval, data_folder, 0.001, True)
-black_learner = TDLearnerData('b', feature_extractor, learning_eval, data_folder, 0.001, False)
+white_learner = TDLearnerData('w', feature_extractor, learning_eval, data_folder, 0.0001, True)
+black_learner = TDLearnerData('b', feature_extractor, learning_eval, data_folder, 0.0001, False)
 # weights = white_learner.get_weights()
 w_eval = white_learner.get_board_evaluator()
 b_eval = black_learner.get_board_evaluator()
