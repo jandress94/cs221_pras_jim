@@ -38,7 +38,7 @@ class TDLearnerGame:
             self.black_engine = engine
 
     def update_weights(self, start_board, end_board, weights, turn):
-        if end_board.result is None: 
+        if end_board.result is None:
             reward = self.eval_fn(end_board, weights, turn)
         elif end_board.result == turn: reward = 1
         else: reward = -1
@@ -63,7 +63,7 @@ class TDLearnerGame:
                 if oldBoard != None:
                     weights = self.update_weights(oldBoard, self.board, weights, turn)
                 oldBoard = self.board
-                    
+
 
             if turn == 'w':
                 move, ev = self.white_engine.get_next_move(self.board)
@@ -102,13 +102,16 @@ class TDLearnerData:
         #     total = sum([abs(x) for x in dict(d).values()])
         #     for key in d:
         #         d[key] /= total
-        weights = {'my pieces b': -0.020805240865742317, 'opponent mobility': 0.006038924232797547, \
-            'opponent pieces q': 0.0031809482535582563, 'opponent pieces p': 0.08542855701037787, \
-            'opponent pieces r': 0.03130194131137462, 'my pieces k': -0.004348334410101487, \
-            'my pieces r': -0.012264248129115054, 'my pieces n': -0.021129062238778695, \
-            'my pieces p': -0.04592605265576196, 'my pieces q': -0.016223203304076266, \
-            'my mobility': 0.005539364980023288, 'opponent pieces b': 0.014757655681540789, \
-            'opponent pieces n': 0.030392414884365324, 'opponent pieces k': 0.026302758142338463}
+
+        weights ={'my pieces b': -0.020884877164403185, 'opponent pieces q': 0.0027937649315177247, 'opponent pieces p': 0.08656753045185818, 'opponent pieces r': 0.03167985225714283, 'my pieces k': -0.0034953612874587697, 'my pieces r': -0.01436313443653616, 'my pieces n': -0.019945511993351116, 'my pieces p': -0.041124848373068006, 'my pieces q': -0.015330339027318493, 'my mobility': -0.0043991206349213875, 'opponent pieces b': 0.01474448329758195,\
+         'opponent pieces n': 0.029737402031847958, 'my mobility sqrt': 0.07165475201315358, 'opponent pieces k': 0.026506066354947826}
+        # # weights = {'my pieces b': -0.020805240865742317, 'opponent mobility': 0.006038924232797547, \
+        # #     'opponent pieces q': 0.0031809482535582563, 'opponent pieces p': 0.08542855701037787, \
+        # #     'opponent pieces r': 0.03130194131137462, 'my pieces k': -0.004348334410101487, \
+        # #     'my pieces r': -0.012264248129115054, 'my pieces n': -0.021129062238778695, \
+        # #     'my pieces p': -0.04592605265576196, 'my pieces q': -0.016223203304076266, \
+        # #     'my mobility': 0.005539364980023288, 'opponent pieces b': 0.014757655681540789, \
+        # #     'opponent pieces n': 0.030392414884365324, 'opponent pieces k': 0.026302758142338463}
         return weights
         weights = defaultdict(float)
         # return weights
@@ -167,15 +170,15 @@ w_eval = white_learner.get_board_evaluator()
 b_eval = black_learner.get_board_evaluator()
 
 # for _ in range(10):
-# game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 5), log=True)
-game1 = GamePlayer(EpsGreedyAlphaBeta(w_eval, 0.2), ForcedLineAlphaBeta(b_eval, 1), log=True)
-game2 = GamePlayer(ForcedLineAlphaBeta(w_eval, 1), EpsGreedyAlphaBeta(b_eval, 0.2), log=False)
+game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
+# game1 = GamePlayer(EpsGreedyAlphaBeta(w_eval, 0.2), ForcedLineAlphaBeta(b_eval, 1), log=True)
+# game2 = GamePlayer(ForcedLineAlphaBeta(w_eval, 1), EpsGreedyAlphaBeta(b_eval, 0.2), log=False)
 
 # game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.1), DynamicDepthAlphaBeta(w_eval), log=False)
 # game = GamePlayer(AlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
 # game = GamePlayer(DepthlessAlphaBeta(w_eval), EpsGreedyAlphaBeta(b_eval, 0.5), log=False)
 # game = GamePlayer(DepthlessAlphaBeta(lambda board : eval(board, weights, 'w')), EpsGreedyAlphaBeta(lambda board : eval(board, weights, 'b')), log=True)
 # game = GamePlayer(white_engine=get_engine(eval, 'w', feature_extractor), black_engine=get_engine(eval, 'b', feature_extractor))
-# game.play_n_games(1)
-game1.play_n_games(5)
-game2.play_n_games(5)
+game.play_n_games(1)
+# game1.play_n_games(5)
+# game2.play_n_games(5)

@@ -10,6 +10,8 @@ class Human(Engine):
         move = "ILLEGAL_MOVE"
         while move == "ILLEGAL_MOVE":
             move_str = raw_input("Play a move: ")
+            if len(move_str) == 0:
+                return board.legal_moves[0], 0
             try:
                 move = board.get_move(move_str)
             except IndexError:

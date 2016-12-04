@@ -37,7 +37,9 @@ def get_player_features(board, side, turn):
     whoseFeatures = 'my' if side == turn else 'opponent'
 
     features = defaultdict(float)
-    features[whoseFeatures + ' mobility'] = mobility(board, side)
+    if whoseFeatures == 'my':
+        features[whoseFeatures + ' mobility'],  features[whoseFeatures + ' mobility sqrt'] = \
+        mobility(board, side)
     pieces = piece_features(board, side)
     for piece in pieces:
         features[whoseFeatures + ' pieces ' + piece] = pieces[piece]
@@ -88,11 +90,12 @@ def feature_extractor(board, turn):
 
 
 def mobility(board, side):
-    real_turn = board.turn
-    board.turn = side
-    result = len(board.get_legal_moves())
-    board.turn = real_turn
-    return result
+    return len(board.legal_moves), math.sqrt(len(board.legal_moves))
+    # real_turn = board.turn
+    # board.turn = side
+    # result = len(board.get_legal_moves())
+    # board.turn = real_turn
+    # return result
 
 def piece_features(board, side):
     pieces = defaultdict(float)

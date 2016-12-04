@@ -18,9 +18,9 @@ class GamePlayer:
     def print_log(self, s):
         if self.log:
             print s
-            
+
     def print_result(self, i):
-        if not self.log: return
+        # if not self.log: return
         print "**************** RESULTS FOR GAME %d ****************" % i
         board = self.board
         # winner

@@ -27,12 +27,10 @@ from Board import *
 # NOTE: there may be bug in "certain of win before..." code, I think i fixed it; will check in morning
 
 
-class ForcedLineAlphaBeta(Engine):
-    def __init__(self, eval_function = None, search_threshold=1):
-        self.pref_min_search = 600
-        self.pref_max_search = 2500
+class FLDDAlphaBeta(Engine):
+    def __init__(self, eval_function=None, search_threshold=1, max_evals=1000):
         self.depth = 3
-        self.orig_depth = 3
+        self.max_evals = max_evals
         # We don't decrement depth whenver there are at most search_treshold moves
         # search_treshold = 1 corresponds to checking forced lines
         self.search_threshold = search_threshold
@@ -42,17 +40,37 @@ class ForcedLineAlphaBeta(Engine):
         return len(board.legal_moves)
 
     def get_next_move(self, board):
-        counter = [0]
         if len(board.legal_moves) == 1: return (board.legal_moves[0], 0)
+        calculated_best_moves = []
+        eval_counts = []
+        max_evals = self.max_evals
+        total_evals = 0
+        depth = self.depth
+        curr_thresh = self.search_threshold
+        while total_evals < max_evals:
+            (move, ev), eval_count = self.get_next_move_help(board, depth, curr_thresh, max_evals - total_evals)
+            calculated_best_moves.append((move, ev))
+            eval_counts.append(eval_counts)
+            total_evals += eval_count
+            depth += 1
+            curr_thresh += 1
+        print "Max depth and threshold: ", (depth, curr_thresh)
+        # check: the last run finished too early, so penultimate run was better
+        # how to check: see which run evaluated more moves! more moves = better depth
+        if len(calculated_best_moves) <= 1: return calculated_best_moves[0]
+        return calculated_best_moves[len(eval_counts) - 1] \
+        if eval_counts[len(eval_counts) - 1] > eval_counts[len(eval_counts) - 2] \
+        else calculated_best_moves[len(eval_counts) - 2]
+
+    def get_next_move_help(self, board, curr_depth, curr_thresh, max_evals):
+        num_evals = [0]
+        # if len(board.legal_moves) == 1: return (board.legal_moves[0], 0)
         # returns (move, eval) pair
         def recurse(board, maximizing, depth, alpha=float("-inf"), beta=float("inf")):
-            counter[0] += 1
-            depth = min(self.depth, depth)
+            num_evals[0] += 1
+            depth = min(curr_depth, depth)
             # print (alpha, beta)
-            # sort by treewidth
             legal_moves = board.legal_moves
-            # legal_moves = sorted(board.legal_moves, key=lambda \
-            # move: len(board.make_move_from_move(move).legal_moves))
 
             if board.get_result() != None or len(legal_moves) == 0 or depth <= 0:
                 evaluation = self.evaluation_function(board)
@@ -73,7 +91,7 @@ class ForcedLineAlphaBeta(Engine):
 
             if maximizing:
                 # next_depth = depth if len(legal_moves) <= self.search_threshold else depth - 1
-                next_depth = depth + 1 if len(legal_moves) <= self.search_threshold else depth - 1
+                next_depth = depth + 1 if len(legal_moves) <= curr_thresh else depth - 1
                 highest_eval = float("-inf")
                 opt_move = None
                 for move in legal_moves:
@@ -91,7 +109,7 @@ class ForcedLineAlphaBeta(Engine):
                 # next_depth = depth + 1 if len(legal_moves) <= self.search_threshold and not carryover else depth - 1
                 lowest_eval  = float("inf")
                 opt_move = None
-                next_depth = depth + 1 if len(legal_moves) <= self.search_threshold else depth - 1
+                next_depth = depth + 1 if len(legal_moves) <= curr_thresh else depth - 1
                 for move in legal_moves:
                     succ = board.make_move_from_move(move)
                     lowest_eval = min(lowest_eval, \
@@ -103,12 +121,5 @@ class ForcedLineAlphaBeta(Engine):
                     if beta <= alpha:
                         break
                 return (opt_move, lowest_eval)
-
-        ret = recurse(board, True, self.depth)
-        print "evaluated %d positions" % counter[0]
-        if counter[0] < self.pref_min_search:
-            self.depth += 1
-        if counter[0] > self.pref_max_search:
-            self.depth = max(self.orig_depth, self.depth - 1)
-        # print self.depth
-        return ret
+        print "evaluated %d positions" % num_evals[0]
+        return (recurse(board, True, curr_depth), num_evals[0])

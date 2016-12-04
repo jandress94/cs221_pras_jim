@@ -26,17 +26,60 @@ from Board import *
 #
 # NOTE: there may be bug in "certain of win before..." code, I think i fixed it; will check in morning
 
+# components of a game tree
+class SearchNode:
+    def __init__(self, board, maxi, successors=[], parent=None, index=-1, \
+    alpha=float("-inf"), beta=float("inf"), eval=0, best_move=None):
+        # board in the game tree
+        self.board = board
+        # possible nodes that can be reached via a move on self.board
+        self.successors = sucessors
+        # the parent node; needed so that we can update evals accordingly
+        # the current board will always become the "root", and then it will
+        # have no parent (well, we'll get rid of it)
+        self.parent = parent
+        # index of this node in the parent's sucessor array (for cutoffs)
+        self.index = index
+        # cutoffs
+        self.alpha = alpha
+        self.beta = beta
+        # optimal stuff data
+        self.eval_estimate = 0
+        self.best_move = None
+        self.maxi_node = maxi
 
-class ForcedLineAlphaBeta(Engine):
-    def __init__(self, eval_function = None, search_threshold=1):
-        self.pref_min_search = 600
-        self.pref_max_search = 2500
+class MemoryEngine(Engine):
+    def __init__(self, eval_function=None, search_threshold=1, player='w'):
+        # self.pref_min_search = 1000
+        # self.pref_max_search = 10000
         self.depth = 3
-        self.orig_depth = 3
+        self.current_node = SearchNode(Board())
+        self.leaves = [self.current_node]
+        # self.orig_depth = 3
         # We don't decrement depth whenver there are at most search_treshold moves
         # search_treshold = 1 corresponds to checking forced lines
         self.search_threshold = search_threshold
         self.evaluation_function = eval_function if eval_function is not None else self.default_eval_function
+
+
+    # def make_node(self, board):
+    #
+    # def get_next_move(self, board):
+    #     old_node = self.current_node
+    #     children = self.sucessors
+    #     for child in children:
+    #         if str(child.board) == str(board):
+    #             self.current_node =
+
+    def extend(self):
+        new_leaves = []
+        for leaf in leaves:
+            succ_boards = [leaf.board.make_move_from_move(move) for move in leaf.board.legal_moves]
+            succ_nodes = [SearchNode(board) for board in succ_boards]
+            leaf.successors = succ_nodes
+
+
+
 
     def default_eval_function(self, board):
         return len(board.legal_moves)
@@ -105,10 +148,10 @@ class ForcedLineAlphaBeta(Engine):
                 return (opt_move, lowest_eval)
 
         ret = recurse(board, True, self.depth)
-        print "evaluated %d positions" % counter[0]
+        # print "evaluation: ", counter[0]
         if counter[0] < self.pref_min_search:
             self.depth += 1
         if counter[0] > self.pref_max_search:
             self.depth = max(self.orig_depth, self.depth - 1)
-        # print self.depth
+        print self.depth
         return ret
