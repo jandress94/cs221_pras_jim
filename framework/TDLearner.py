@@ -90,15 +90,15 @@ class TDLearnerData:
         #     total = sum([abs(x) for x in dict(d).values()])
         #     for key in d:
         #         d[key] /= total
-        weights = {'w mobility': 0.00794453399588799, 'w pieces n': -0.37770634987581486, \
-        'b pieces n': 0.3259256111814666, 'w pieces k': -0.217740060989421, \
-        'b pieces k': 0.1975389514945781, 'w pieces r': -0.43857848646965436, \
-        'w pieces q': -0.1965540356358875, 'w pieces b': -0.32153572268987485, \
-        'b pieces b': 0.25215039828608354, 'b pieces r': 0.30588559507108515, \
-        'b pieces q': 0.106430088995805,'b pieces p': 0.5986063533783763, \
-        'w pieces p': -0.9282910790839152, 'b mobility': -0.006369695141804626}
-        return weights
-        # weights = defaultdict(float)
+        # weights = {'w mobility': 0.00794453399588799, 'w pieces n': -0.37770634987581486, \
+        # 'b pieces n': 0.3259256111814666, 'w pieces k': -0.217740060989421, \
+        # 'b pieces k': 0.1975389514945781, 'w pieces r': -0.43857848646965436, \
+        # 'w pieces q': -0.1965540356358875, 'w pieces b': -0.32153572268987485, \
+        # 'b pieces b': 0.25215039828608354, 'b pieces r': 0.30588559507108515, \
+        # 'b pieces q': 0.106430088995805,'b pieces p': 0.5986063533783763, \
+        # 'w pieces p': -0.9282910790839152, 'b mobility': -0.006369695141804626}
+        # return weights
+        weights = defaultdict(float)
         # return weights
 
         # data_folder = '../scraper/data/'
@@ -114,8 +114,11 @@ class TDLearnerData:
             else:
                 game_data = parseGame(line)
                 if game_data is not None:
-                    # not entirely accurate because of stalemate, it's a super special case
-                    winner = 'w' if game_data[len(game_data) - 1][1] == None else 'b'
+
+                    game = GamePlayer(white_engine=Lichess(game_data, 'w'), black_engine=Lichess(game_data, 'b'), log = False)
+                    game.play_game()
+
+                    winner = game.board.result
                     tdLearner = TDLearnerGame(white_engine=Lichess(game_data, 'w'), black_engine=Lichess(game_data, 'b'), \
                     win = winner, turn=self.turn, feature_extractor=self.extractor, eval_fn=self.eval_fn, eta=self.eta, log=self.log)
                     # TODO look at eval_fn necessecity
