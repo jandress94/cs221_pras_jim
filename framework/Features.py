@@ -14,8 +14,7 @@ def dotProduct(d1, d2):
         return sum(d1.get(f, 0) * v for f, v in d2.items())
 
 def learning_eval(board, weights, turn):
-    mult = 1 if turn == 'w' else -1
-    return mult * dotProduct(weights, feature_extractor(board))
+    return dotProduct(weights, feature_extractor(board, turn))
 
 def eval(board, weights, turn):
     # print "DOING NORMAL EVALLLL"
@@ -23,8 +22,7 @@ def eval(board, weights, turn):
     #     if board.result == turn: return float('inf')
     #     if board.result == 'd': return 0
     #     if board.result != turn: return float('-inf')
-    mult = 1 if turn == 'w' else -1
-    return mult * dotProduct(weights, feature_extractor(board))
+    return dotProduct(weights, feature_extractor(board, turn))
 
 # def other_eval(board, weights, turn):
 #     # print "DOING OTHER EVALLLLLLL"
@@ -34,18 +32,20 @@ def eval(board, weights, turn):
 
 # helpers for the evaluaton function
 
-def get_player_features(board, turn):
+def get_player_features(board, side, turn):
     # TODO add more features
+    whoseFeatures = 'my' if side == turn else 'opponent'
+
     features = defaultdict(float)
-    features[turn + ' mobility'] = mobility(board, turn)
-    pieces = piece_features(board, turn)
+    features[whoseFeatures + ' mobility'] = mobility(board, side)
+    pieces = piece_features(board, side)
     for piece in pieces:
-        features[turn + ' pieces ' + piece] = pieces[piece]
+        features[whoseFeatures + ' pieces ' + piece] = pieces[piece]
     return features
 
-def feature_extractor(board):
-    white_features = get_player_features(board, 'w')
-    black_features = get_player_features(board, 'b')
+def feature_extractor(board, turn):
+    white_features = get_player_features(board, 'w', turn)
+    black_features = get_player_features(board, 'b', turn)
     addScaled(white_features, black_features, 1)
     return white_features
 
@@ -87,20 +87,20 @@ def feature_extractor(board):
 
 
 
-def mobility(board, turn):
+def mobility(board, side):
     real_turn = board.turn
-    board.turn = turn
+    board.turn = side
     result = len(board.get_legal_moves())
     board.turn = real_turn
     return result
 
-def piece_features(board, turn):
+def piece_features(board, side):
     pieces = defaultdict(float)
     # mult = 1 if turn == 'w' else -1
     position = board.position
     for (row, col) in product(xrange(len(position)), xrange(len(position))):
         piece  = position[row][col]
-        if piece != None and (piece.islower() == (turn == 'b')):
+        if piece != None and (piece.islower() == (side == 'b')):
             piece = piece[0]
             pieces[piece.lower()] += 1
     return pieces
