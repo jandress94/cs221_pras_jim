@@ -17,7 +17,12 @@ class GamePlayer:
 
     def print_log(self, s):
         if self.log:
+            # play as white:
             print s
+            # play as black:
+            # print s.print_flipped_board()
+            # play by turn:
+            # s.print_board()
 
     def print_result(self, i):
         # if not self.log: return
