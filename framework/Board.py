@@ -318,13 +318,14 @@ class Board:
         if not epSet:
             board_cpy.ep = None
 
+        board_cpy.legal_moves = board_cpy.get_legal_moves()
+
         if board_cpy.position_count[str(self)] == 2:
             board_cpy.result = 'd'
         else:
             board_cpy.position_count[str(self)] += 1
             board_cpy.result = board_cpy.result_checks()
 
-        board_cpy.legal_moves = board_cpy.get_legal_moves()
 
         return board_cpy
 

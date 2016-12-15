@@ -18,9 +18,9 @@ class GamePlayer:
     def print_log(self, s):
         if self.log:
             # play as white:
-            print s
+            # print s
             # play as black:
-            # print s.print_flipped_board()
+            print s.print_flipped_board()
             # play by turn:
             # s.print_board()
 
@@ -94,6 +94,7 @@ class GamePlayer:
         b_stats = {"num moves":0, "avg legal moves":0, "game won at": 0}
         self.print_log(self.board)
         while self.board.result == None:
+            print self.board.result
             if self.board.turn == 'w':
                 w_stats["num moves"] += 1
                 w_stats["avg legal moves"] += len(self.board.legal_moves)

@@ -171,8 +171,8 @@ w_eval = white_learner.get_board_evaluator()
 b_eval = black_learner.get_board_evaluator()
 
 # for _ in range(10):
-# game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
-game = GamePlayer( ForcedLineAlphaBeta(w_eval, 1), Human(), log=True)
+game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
+# game = GamePlayer(EpsGreedyAlphaBeta(alpha_beta=MemoryEngine(w_eval, 1)), EpsGreedyAlphaBeta(alpha_beta=ForcedLineAlphaBeta(b_eval, 1)), log=False)
 
 
 # game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
