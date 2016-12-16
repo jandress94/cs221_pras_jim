@@ -46,8 +46,31 @@ class Board:
         #     s +=  '\n\n'
         # return s
 
+    def print_flipped_board(self):
+        new_board = Board()
+        new_board.position = [row[::-1] for row in self.position[::-1]]
+
+        s = "\n"
+        board = new_board.position
+        for row in range(7, -1, -1):
+            s += str(8 - row) + ' | '
+            for col in range(7, -1, -1):
+                if board[row][col] == None:
+                    s += ' .  '
+                else:
+                    s += ' ' + board[row][col] + '  '
+            s += '\n  |\n'
+        s += '  +---------------------------------\n'
+        s += '     H   G   F   E   D   C   B   A\n'
+        return s
+        return new_board
+
+
     def print_board(self):
-        print self
+        if self.turn == 'w':
+            print self
+        else:
+            print self.print_flipped_board()
         # print "\n"
         # board = self.position
         # for row in board:
@@ -156,7 +179,7 @@ class Board:
 
 
     def print_legal_moves(self):
-        print [move.move_to_str() for move in self.get_legal_moves()]
+        print [move.move_to_str() for move in self.legal_moves]
 
     # takes a string "e2e4" and returns the move
     # Move((2, 4), (4, 4))
@@ -168,6 +191,15 @@ class Board:
     #   -> promotion: encoded "e7e8, Q" for white, or "e2e1, q" for black
     # assumes that move strings are correctly formatted
     def get_move(self, move_str):
+        # print move_str
+        # print self.legal_moves
+        poss_moves = [poss for poss in self.legal_moves if str(poss) == move_str]
+        # move = self.get_move(move_str)
+        if len(poss_moves) == 0:
+            return "ILLEGAL_MOVE"
+        return poss_moves[0]
+
+
 
         def str_to_square(str):
             return (int(str[1]) - 1, 7 - ord(str[0]) + ord('a'))
@@ -178,8 +210,8 @@ class Board:
             start = str_to_square(start_str)
             end = str_to_square(end_str)
 
-            return Move(start, end, promoting_piece=move_str[len(move_str) - 1], capture=self.get_piece(end[0], end[1]) is not None)
-            
+            return Move(start, end, promoting_piece=move_str[len(move_str) - 1])
+
         else:
             start_str = move_str[:2]
             end_str = move_str[2:]
@@ -198,7 +230,7 @@ class Board:
 
 
     def result_checks(self):
-        if len(self.get_legal_moves()) == 0:
+        if len(self.legal_moves) == 0:
             if not self.has_pieces(self.turn): # out of pieces!!
                 return self.turn
             else: # Stalemate!!
@@ -286,13 +318,14 @@ class Board:
         if not epSet:
             board_cpy.ep = None
 
+        board_cpy.legal_moves = board_cpy.get_legal_moves()
+
         if board_cpy.position_count[str(self)] == 2:
             board_cpy.result = 'd'
         else:
             board_cpy.position_count[str(self)] += 1
             board_cpy.result = board_cpy.result_checks()
 
-        board_cpy.legal_moves = board_cpy.get_legal_moves()
 
         return board_cpy
 
@@ -300,15 +333,19 @@ class Board:
     # moves are made like: e2e4, e2e3
     # returns "ILLEGAL_MOVE" if illegal
     def make_move(self, move_str):
-        poss_moves = [poss for poss in self.get_legal_moves() if str(poss) == str(move)]
+        # print "HERE"
+        # print move_str
+        # print self.legal_moves
+        poss_moves = [poss for poss in self.legal_moves if str(poss) == move_str]
         # move = self.get_move(move_str)
         if len(poss_moves) == 0:
             return "ILLEGAL_MOVE"
-        return self.make_move_from_move(moves[0])
+        return self.make_move_from_move(poss_moves[0])
 
     # conversion from algebraic notation to start-end notation
     # takes in string
     def algebraic_to_se(self, alg):
+        print alg
 
         def str_to_square(str):
             return (int(str[1]) - 1, 7 - ord(str[0]) + ord('a'))
@@ -346,7 +383,7 @@ class Board:
         else:
             end_str = norm_alg[-2:]
             end = str_to_square(end_str)
-            moves = self.get_legal_moves()
+            moves = self.legal_moves
 
             # checks are in this order:
             #   1. end point is correct

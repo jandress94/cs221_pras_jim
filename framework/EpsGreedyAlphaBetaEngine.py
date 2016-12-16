@@ -13,12 +13,12 @@ import random
 #   and playing one of those at random.
 
 class EpsGreedyAlphaBeta(Engine):
-    def __init__(self, eval_function = None, eps = 0.05):
+    def __init__(self, alpha_beta=None, eval_function=None, eps = 0.1):
         self.epsilon = eps
-        self.alpha_beta = AlphaBeta(eval_function)
+        self.alpha_beta = alpha_beta if alpha_beta != None else AlphaBeta(eval_function)
 
     def get_next_move(self, board):
         if random.random() < self.epsilon:
-            return random.choice(board.get_legal_moves()), 0
+            return random.choice(board.legal_moves), 0
         else:
             return self.alpha_beta.get_next_move(board)

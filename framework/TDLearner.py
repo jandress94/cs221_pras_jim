@@ -12,6 +12,7 @@ from DynamicDepthAlphaBetaEngine import DynamicDepthAlphaBeta
 from EpsGreedyAlphaBetaEngine import EpsGreedyAlphaBeta
 from ForcedLineAlphaBetaEngine import ForcedLineAlphaBeta
 from HumanEngine import Human
+from MemoryEngine import MemoryEngine
 import random
 
 class TDLearnerGame:
@@ -103,8 +104,8 @@ class TDLearnerData:
         #     for key in d:
         #         d[key] /= total
 
-        weights ={'my pieces b': -0.020884877164403185, 'opponent pieces q': 0.0027937649315177247, 'opponent pieces p': 0.08656753045185818, 'opponent pieces r': 0.03167985225714283, 'my pieces k': -0.0034953612874587697, 'my pieces r': -0.01436313443653616, 'my pieces n': -0.019945511993351116, 'my pieces p': -0.041124848373068006, 'my pieces q': -0.015330339027318493, 'my mobility': -0.0043991206349213875, 'opponent pieces b': 0.01474448329758195,\
-         'opponent pieces n': 0.029737402031847958, 'my mobility sqrt': 0.07165475201315358, 'opponent pieces k': 0.026506066354947826}
+        weights = {'my pieces b': -0.02125041819023277, 'opponent mobility': 0.008108721768922439, 'opponent pieces q': 0.0022495582659331757, 'opponent pieces p': 0.08043993630606892, 'opponent mobility sqrt': -0.06735345100924717, 'opponent pieces r': 0.029582039415964725, 'my pieces k': -0.003507709082639517, 'my pieces r': -0.01428200816896972, 'my pieces n': -0.02011169194370178, 'my pieces p': -0.04322280926858769, 'my pieces q': -0.015556494772511434, \
+        'my mobility': -0.008108721768922439, 'opponent pieces b': 0.013231840410296025, 'opponent pieces n': 0.027705901416900165, 'my mobility sqrt': 0.06735345100924717, 'opponent pieces k': 0.02553393365138097}
         # # weights = {'my pieces b': -0.020805240865742317, 'opponent mobility': 0.006038924232797547, \
         # #     'opponent pieces q': 0.0031809482535582563, 'opponent pieces p': 0.08542855701037787, \
         # #     'opponent pieces r': 0.03130194131137462, 'my pieces k': -0.004348334410101487, \
@@ -113,7 +114,7 @@ class TDLearnerData:
         # #     'my mobility': 0.005539364980023288, 'opponent pieces b': 0.014757655681540789, \
         # #     'opponent pieces n': 0.030392414884365324, 'opponent pieces k': 0.026302758142338463}
         return weights
-        weights = defaultdict(float)
+        # weights = defaultdict(float)
         # return weights
 
         # data_folder = '../scraper/data/'
@@ -163,7 +164,7 @@ def get_eval(weights):
 
 # TESTING STUFF
 data_folder = '../scraper/data/'
-white_learner = TDLearnerData('w', feature_extractor, learning_eval, data_folder, 0.0001, True)
+white_learner = TDLearnerData('w', feature_extractor, learning_eval, data_folder, 0.0001, False)
 black_learner = TDLearnerData('b', feature_extractor, learning_eval, data_folder, 0.0001, False)
 # weights = white_learner.get_weights()
 w_eval = white_learner.get_board_evaluator()
@@ -171,7 +172,11 @@ b_eval = black_learner.get_board_evaluator()
 
 # for _ in range(10):
 game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
-# game1 = GamePlayer(EpsGreedyAlphaBeta(w_eval, 0.2), ForcedLineAlphaBeta(b_eval, 1), log=True)
+# game = GamePlayer(EpsGreedyAlphaBeta(alpha_beta=MemoryEngine(w_eval, 1)), EpsGreedyAlphaBeta(alpha_beta=ForcedLineAlphaBeta(b_eval, 1)), log=False)
+
+
+# game = GamePlayer(Human(), ForcedLineAlphaBeta(b_eval, 1), log=True)
+# game1 = GamePlayer(EpsGreedyAlphaBeta(w_eval, 0.2), ForcedLineAlphaBeta(b_eval, 1), log=False)
 # game2 = GamePlayer(ForcedLineAlphaBeta(w_eval, 1), EpsGreedyAlphaBeta(b_eval, 0.2), log=False)
 
 # game = GamePlayer(EpsGreedyAlphaBeta(b_eval, 0.1), DynamicDepthAlphaBeta(w_eval), log=False)

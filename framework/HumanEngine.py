@@ -20,8 +20,10 @@ class Human(Engine):
                 continue
 
             # board.print_legal_moves()
-            if move.params not in [poss.params for poss in board.get_legal_moves()]:
+            if str(move) not in [str(poss) for poss in board.legal_moves]:
                 move = "ILLEGAL_MOVE"
+                print "Invalid input, here are your choices: "
+                board.print_legal_moves()
         return move, 0
 
         # move_map = {move.move_to_str(): move for move in board.get_legal_moves()}
